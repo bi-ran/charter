@@ -1,4 +1,6 @@
 #include <fstream>
+#include <iostream>
+#include <numeric>
 #include <queue>
 #include <set>
 #include <string>
@@ -10,6 +12,17 @@ static std::vector<const char*> colours = {
 
 std::set<uint32_t> explore(uint8_t* blockmap,
    uint32_t i, std::size_t width, std::size_t height);
+
+inline void dump_patches(const std::vector<
+      std::set<uint32_t>>& patches) {
+   for (const auto& p : patches) {
+      std::adjacent_difference(std::begin(p), std::end(p),
+         std::ostream_iterator<uint32_t>(std::cout),
+         [](uint32_t x, uint32_t) -> uint32_t {
+            return std::cout << ", ", x; });
+      printf("\n");
+   }
+}
 
 int chart(const char* input) {
    /* open file */

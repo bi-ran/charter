@@ -46,21 +46,21 @@ int chart(const char* input) {
 
    /* build array of blocks */
    uint8_t* blockmap = new uint8_t[size];
-   for (uint32_t i = 0; i < lines.size(); ++i)
-      for (uint32_t c = 0; c < lines[i].size(); ++c)
-         blockmap[i * width + c] = lines[i][c] != ' ';
+   for (uint32_t i=0; i<lines.size(); ++i)
+      for (uint32_t c=0; c<lines[i].size(); ++c)
+         blockmap[i*width+c] = lines[i][c] != ' ';
 
    /* TODO: infill from edges to outer border */
    /* assume input maximally subtends array   */
 
    /* check for border blocks with only one connection */
-   for (uint32_t i = 0; i < size; ++i) {
+   for (uint32_t i=0; i<size; ++i) {
       if (blockmap[i]) {
          uint32_t nb = 0;
-         if (i % width && blockmap[i-1]) ++nb;
-         if (i % width + 1 < width && blockmap[i+1]) ++nb;
-         if (i / width && blockmap[i-width]) ++nb;
-         if (i / width + 1 < height && blockmap[i+width]) ++nb;
+         if (i%width && blockmap[i-1]) ++nb;
+         if (i%width+1 < width && blockmap[i+1]) ++nb;
+         if (i/width && blockmap[i-width]) ++nb;
+         if (i/width+1 < height && blockmap[i+width]) ++nb;
 
          if (nb < 2) {
             printf("error: invalid config\n"
@@ -72,7 +72,7 @@ int chart(const char* input) {
 
    /* find patches */
    std::vector<std::set<uint32_t>> patches;
-   for (uint32_t i = 0; i < size; ++i) {
+   for (uint32_t i=0; i<size; ++i) {
       if (blockmap[i] & 0x3) { continue; }
       patches.emplace_back(explore(blockmap, i,
          width, height));
@@ -91,7 +91,7 @@ int chart(const char* input) {
 
    /* reformat blockmap */
    memset(blockmap, 0, size * sizeof(uint8_t));
-   for (uint32_t i = 0; i < patches.size(); ++i) {
+   for (uint32_t i=0; i<patches.size(); ++i) {
       const auto& p = patches[i];
       for (const auto& b : p)
          blockmap[b] = i + 1;
@@ -99,9 +99,9 @@ int chart(const char* input) {
 
    /* output coloured diagram */
    if (patches.size() < colours.size()) {
-      for (uint32_t i = 0; i < size; ++i) {
+      for (uint32_t i=0; i<size; ++i) {
          printf("%s %s", colours[blockmap[i]], colours[0]);
-         if (i % width == width - 1)
+         if (i%width == width-1)
             printf("\n");
       }
    } else {
@@ -130,10 +130,10 @@ std::set<uint32_t> explore(uint8_t* blockmap, uint32_t i,
       if (blockmap[i] & 0x3) { continue; }
 
       blockmap[i] |= 0x2; blocks.insert(i);
-      if (i % width) queue.push(i-1);
-      if (i % width + 1 < width) queue.push(i+1);
-      if (i / width) queue.push(i-width);
-      if (i / width + 1 < height) queue.push(i+width);
+      if (i%width) queue.push(i-1);
+      if (i%width+1 < width) queue.push(i+1);
+      if (i/width) queue.push(i-width);
+      if (i/width+1 < height) queue.push(i+width);
    }
 
    return blocks;

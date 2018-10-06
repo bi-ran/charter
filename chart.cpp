@@ -53,8 +53,22 @@ int chart(const char* input) {
    /* TODO: infill from edges to outer border */
    /* assume input maximally subtends array   */
 
-   /* TODO: check for stranded islands                 */
    /* check for border blocks with only one connection */
+   for (uint32_t i = 0; i < size; ++i) {
+      if (blockmap[i]) {
+         uint32_t nb = 0;
+         if (i % width && blockmap[i-1]) ++nb;
+         if (i % width + 1 < width && blockmap[i+1]) ++nb;
+         if (i / width && blockmap[i-width]) ++nb;
+         if (i / width + 1 < height && blockmap[i+width]) ++nb;
+
+         if (nb < 2) {
+            printf("error: invalid config\n"
+               "  - incomplete border\n");
+            return 1;
+         }
+      }
+   }
 
    /* find patches */
    std::vector<std::set<uint32_t>> patches;

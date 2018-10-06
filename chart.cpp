@@ -13,6 +13,15 @@ static std::vector<const char*> colours = {
 std::set<uint32_t> explore(uint8_t* blockmap,
    uint32_t i, std::size_t width, std::size_t height);
 
+bool check_diagonal(uint32_t i, uint32_t j,
+      uint8_t* blockmap, uint32_t width) {
+   uint32_t ij = i + j%width - i%width;
+   uint32_t ji = j + i%width - j%width;
+   if (blockmap[ij] && blockmap[ji] && !blockmap[j])
+      return false;
+   return true;
+}
+
 inline void dump_patches(const std::vector<
       std::set<uint32_t>>& patches) {
    for (const auto& p : patches) {
@@ -53,7 +62,10 @@ int chart(const char* input) {
    /* TODO: infill from edges to outer border */
    /* assume input maximally subtends array   */
 
-   /* check for border blocks with only one connection */
+   /* check for well-formedness of input
+    *    ! border blocks with only one neighbouring block
+    *    ! diagonal blocks
+    */
    for (uint32_t i=0; i<size; ++i) {
       if (blockmap[i]) {
          uint32_t nb = 0;
@@ -67,6 +79,16 @@ int chart(const char* input) {
                "  - incomplete border\n");
             return 1;
          }
+      } else {
+         /* assume patch blocks cannot exist on edges */
+         if (!check_diagonal(i, i-width-1, blockmap, width)
+               || !check_diagonal(i, i-width+1, blockmap, width)
+               || !check_diagonal(i, i+width-1, blockmap, width)
+               || !check_diagonal(i, i+width+1, blockmap, width)) {
+            printf("error: invalid config\n"
+               "  - diagonal border\n");
+            return 1;
+         }
       }
    }
 
@@ -77,9 +99,6 @@ int chart(const char* input) {
       patches.emplace_back(explore(blockmap, i,
          width, height));
    }
-
-   /* TODO: check for diagonals   */
-   /* assume input is well-formed */
 
    /* expand all patches to pixel left/above */
    for (auto& p : patches) {

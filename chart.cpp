@@ -23,6 +23,19 @@ bool check_diagonal(uint32_t i, uint32_t j,
    return true;
 }
 
+template<template<typename...> class T>
+uint32_t bounding_box(const T<uint32_t>& patch, uint32_t width) {
+   auto xb = std::minmax_element(std::begin(patch), std::end(patch),
+      [&](auto a, auto b) { return (a%width) < (b%width); });
+   auto yb = std::minmax_element(std::begin(patch), std::end(patch),
+      [&](auto a, auto b) { return (a/width) < (b/width); });
+
+   auto xspan = (*xb.second - *xb.first) % width + 1;
+   auto yspan = *yb.second/width - *yb.first/width + 1;
+
+   return xspan * yspan;
+}
+
 inline void dump_patches(const std::deque<
       std::set<uint32_t>>& patches) {
    for (const auto& p : patches) {
@@ -128,7 +141,17 @@ int chart(const char* input) {
       printf("too many patches for coloured display\n");
    }
 
+   /* merge patches for overall canvas size */
+   std::vector<uint32_t> merged;
+   for (const auto& p : patches)
+      std::copy(std::begin(p), std::end(p),
+         std::back_inserter(merged));
+
    /* find bounding rectangles for all patches */
+   std::vector<uint32_t> bounds;
+   bounds.emplace_back(bounding_box(merged, width));
+   for (const auto& p : patches)
+      bounds.emplace_back(bounding_box(p, width));
 
    /* input dimensions
     *    highlight frame border

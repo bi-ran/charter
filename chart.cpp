@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+static std::vector<const char*> colours = {
+   "\033[0m", "\033[41m", "\033[43m", "\033[42m",
+   "\033[46m", "\033[44m", "\033[45m", "\033[101m" };
+
 std::set<uint32_t> explore(uint8_t* blockmap,
    uint32_t i, std::size_t width, std::size_t height);
 
@@ -47,10 +51,35 @@ int chart(const char* input) {
          width, height));
    }
 
-   /* check for diagonals */
-   /* expand all patches to pixel to the left */
-   /* expand all patches to pixel above */
+   /* TODO: check for diagonals   */
+   /* assume input is well-formed */
+
+   /* expand all patches to pixel left/above */
+   for (auto& p : patches) {
+      for (const auto& b : p)
+         p.insert(b-1);
+      for (const auto& b : p)
+         p.insert(b-width);
+   }
+
+   /* reformat blockmap */
+   memset(blockmap, 0, size * sizeof(uint8_t));
+   for (uint32_t i = 0; i < patches.size(); ++i) {
+      const auto& p = patches[i];
+      for (const auto& b : p)
+         blockmap[b] = i + 1;
+   }
+
    /* output coloured diagram */
+   if (patches.size() < colours.size()) {
+      for (uint32_t i = 0; i < size; ++i) {
+         printf("%s %s", colours[blockmap[i]], colours[0]);
+         if (i % width == width - 1)
+            printf("\n");
+      }
+   } else {
+      printf("too many patches for coloured display\n");
+   }
 
    /* find bounding rectangles for all patches */
 

@@ -46,8 +46,8 @@ int chart(const char* input) {
 
    /* build array of blocks */
    uint8_t* blockmap = new uint8_t[size];
-   for (auto i = 0; i < lines.size(); ++i)
-      for (auto c = 0; c < lines[i].size(); ++c)
+   for (uint32_t i = 0; i < lines.size(); ++i)
+      for (uint32_t c = 0; c < lines[i].size(); ++c)
          blockmap[i * width + c] = lines[i][c] != ' ';
 
    /* TODO: infill from edges to outer border */

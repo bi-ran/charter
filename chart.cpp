@@ -1,12 +1,13 @@
+#include <deque>
 #include <fstream>
 #include <iostream>
 #include <numeric>
-#include <queue>
 #include <set>
+#include <stack>
 #include <string>
 #include <vector>
 
-static std::vector<const char*> colours = {
+static const std::vector<const char*> colours = {
    "\033[0m", "\033[41m", "\033[43m", "\033[42m",
    "\033[46m", "\033[44m", "\033[45m", "\033[101m" };
 
@@ -22,7 +23,7 @@ bool check_diagonal(uint32_t i, uint32_t j,
    return true;
 }
 
-inline void dump_patches(const std::vector<
+inline void dump_patches(const std::deque<
       std::set<uint32_t>>& patches) {
    for (const auto& p : patches) {
       std::adjacent_difference(std::begin(p), std::end(p),
@@ -43,7 +44,7 @@ int chart(const char* input) {
 
    /* read input */
    std::string line;
-   std::vector<std::string> lines;
+   std::deque<std::string> lines;
    while (std::getline(fstream, line))
       lines.emplace_back(std::move(line));
 
@@ -93,7 +94,7 @@ int chart(const char* input) {
    }
 
    /* find patches */
-   std::vector<std::set<uint32_t>> patches;
+   std::deque<std::set<uint32_t>> patches;
    for (uint32_t i=0; i<size; ++i) {
       if (blockmap[i] & 0x3) { continue; }
       patches.emplace_back(explore(blockmap, i,
@@ -140,22 +141,22 @@ int chart(const char* input) {
 
 std::set<uint32_t> explore(uint8_t* blockmap, uint32_t i,
       std::size_t width, std::size_t height) {
-   std::set<uint32_t> blocks;
-   std::queue<uint32_t> queue;
+   std::set<uint32_t> patch;
+   std::stack<uint32_t> blocks;
 
-   blocks.insert(i); queue.push(i);
-   while (!queue.empty()) {
-      i = queue.front(); queue.pop();
+   patch.insert(i); blocks.push(i);
+   while (!blocks.empty()) {
+      i = blocks.top(); blocks.pop();
       if (blockmap[i] & 0x3) { continue; }
 
-      blockmap[i] |= 0x2; blocks.insert(i);
-      if (i%width) queue.push(i-1);
-      if (i%width+1 < width) queue.push(i+1);
-      if (i/width) queue.push(i-width);
-      if (i/width+1 < height) queue.push(i+width);
+      blockmap[i] |= 0x2; patch.insert(i);
+      if (i%width) blocks.push(i-1);
+      if (i%width+1 < width) blocks.push(i+1);
+      if (i/width) blocks.push(i-width);
+      if (i/width+1 < height) blocks.push(i+width);
    }
 
-   return blocks;
+   return patch;
 }
 
 int main(int argc, char* argv[]) {

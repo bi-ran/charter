@@ -35,13 +35,14 @@ int chart(const char* input) {
     *    ! border blocks with only one neighbouring block
     *    ! diagonal blocks
     */
-   chart->for_all_blocks([&](uint32_t i, uint8_t) {
+   chart->for_all_blocks([&](uint32_t i) {
       if (!chart->check_well_formed(i)) exit(1); });
 
    /* find patches */
    std::deque<std::set<uint32_t>> patches;
-   chart->for_all_blocks([&](uint32_t i, uint8_t b) {
-      if (!(b & 0x3)) patches.emplace_back(chart->explore(i)); });
+   chart->for_all_blocks([&](uint32_t i) {
+      std::set<uint32_t>&& p = chart->explore(i);
+      if (p.size()) patches.emplace_back(p); });
 
    /* expand all patches to pixel left/above */
    for (auto& p : patches) {

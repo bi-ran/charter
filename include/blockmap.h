@@ -76,7 +76,7 @@ std::set<uint32_t> blockmap::explore(uint32_t i) {
    std::set<uint32_t> patch;
    std::stack<uint32_t> blocks;
 
-   patch.insert(i); blocks.push(i);
+   blocks.push(i);
    while (!blocks.empty()) {
       i = blocks.top(); blocks.pop();
       if (map_[i] & 0x3) { continue; }
@@ -104,8 +104,7 @@ uint32_t blockmap::bounding_box(const T<uint32_t>& patch) {
 
 template<typename L>
 void blockmap::for_all_blocks(L lambda) {
-   for (uint32_t i=0; i<size_; ++i)
-      lambda(i, map_[i]);
+   for (uint32_t i=0; i<size_; ++i) lambda(i);
 }
 
 template<typename L>

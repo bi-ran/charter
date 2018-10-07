@@ -22,7 +22,7 @@ class blockmap {
       uint8_t* map() { return map_; }
       uint32_t size() { return size_; }
 
-      void reset_map() { memset(map_, 0, size_ * sizeof(uint8_t)); }
+      void reset_map() { if (size_) memset(map_, 0, size_); }
 
       template<template<typename...> class T>
       void load(const T<std::string>& lines);

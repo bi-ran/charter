@@ -2,6 +2,7 @@
 #define BLOCKMAP_H
 
 #include <algorithm>
+#include <iostream>
 #include <set>
 #include <stack>
 #include <string>
@@ -38,6 +39,9 @@ class blockmap {
 
       template<template<typename...> class T>
       uint32_t bounding_box(const T<uint32_t>& patch);
+
+      template<typename L>
+      void display_2d(L lambda);
 
       bool check_well_formed(uint32_t i);
       bool check_neighbours(uint32_t i);
@@ -104,6 +108,15 @@ uint32_t blockmap::bounding_box(const T<uint32_t>& patch) {
    auto yspan = *yb.second/width_ - *yb.first/width_ + 1;
 
    return xspan * yspan;
+}
+
+template<typename L>
+void blockmap::display_2d(L lambda) {
+   for (uint32_t i=0; i<height_; ++i) {
+      for (uint32_t j=0; j<width_; ++j)
+         std::cout << lambda(map_[i*width_+j]);
+      std::cout << std::endl;
+   }
 }
 
 bool blockmap::check_well_formed(uint32_t i) {

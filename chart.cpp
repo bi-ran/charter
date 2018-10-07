@@ -27,8 +27,6 @@ int chart(const char* input) {
 
    /* initialise blockmap */
    auto chart = new blockmap(lines);
-   auto map = chart->map();
-   auto size = chart->size();
 
    /* TODO: infill from edges to outer border */
    /* assume input maximally subtends array   */
@@ -37,16 +35,13 @@ int chart(const char* input) {
     *    ! border blocks with only one neighbouring block
     *    ! diagonal blocks
     */
-   for (uint32_t i=0; i<size; ++i)
-      if (!chart->check_well_formed(i))
-         return 1;
+   chart->for_all_blocks([&](uint32_t i, uint8_t) {
+      if (!chart->check_well_formed(i)) exit(1); });
 
    /* find patches */
    std::deque<std::set<uint32_t>> patches;
-   for (uint32_t i=0; i<size; ++i) {
-      if (map[i] & 0x3) { continue; }
-      patches.emplace_back(chart->explore(i));
-   }
+   chart->for_all_blocks([&](uint32_t i, uint8_t b) {
+      if (!(b & 0x3)) patches.emplace_back(chart->explore(i)); });
 
    /* expand all patches to pixel left/above */
    for (auto& p : patches) {

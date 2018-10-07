@@ -19,9 +19,6 @@ class blockmap {
       template<template<typename...> class T>
       blockmap(const T<std::string>& lines) { load(lines); }
 
-      uint8_t* map() { return map_; }
-      uint32_t size() { return size_; }
-
       void reset_map() { if (size_) memset(map_, 0, size_); }
 
       template<template<typename...> class T>
@@ -39,6 +36,9 @@ class blockmap {
       inline uint32_t south(uint32_t i) { return i + width_; }
       inline uint32_t west(uint32_t i) { return i - 1; }
       inline uint32_t north(uint32_t i) { return i - width_; }
+
+      template<typename L>
+      void for_all_blocks(L lambda);
 
       template<typename L>
       void for_direct_neighbours(uint32_t i, L lambda);
@@ -100,6 +100,12 @@ uint32_t blockmap::bounding_box(const T<uint32_t>& patch) {
    auto yspan = *yb.second/width_ - *yb.first/width_ + 1;
 
    return xspan * yspan;
+}
+
+template<typename L>
+void blockmap::for_all_blocks(L lambda) {
+   for (uint32_t i=0; i<size_; ++i)
+      lambda(i, map_[i]);
 }
 
 template<typename L>

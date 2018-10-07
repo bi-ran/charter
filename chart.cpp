@@ -28,8 +28,9 @@ int chart(const char* input) {
    /* initialise blockmap */
    auto chart = new blockmap(lines);
 
-   /* TODO: infill from edges to outer border */
-   /* assume input maximally subtends array   */
+   /* infill from edges to outer border */
+   chart->for_all_blocks([&](uint32_t i) {
+      if (chart->on_edge(i)) chart->explore(i); });
 
    /* check for well-formedness of input
     *    ! border blocks with only one neighbouring block

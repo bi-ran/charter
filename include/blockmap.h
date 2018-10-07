@@ -36,6 +36,7 @@ class blockmap {
       inline uint32_t south(uint32_t i) { return i + width_; }
       inline uint32_t west(uint32_t i) { return i - 1; }
       inline uint32_t north(uint32_t i) { return i - width_; }
+      bool on_edge(uint32_t i);
 
       template<typename L>
       void for_all_blocks(L lambda);
@@ -102,6 +103,12 @@ uint32_t blockmap::bounding_box(const T<uint32_t>& patch) {
    return xspan * yspan;
 }
 
+bool blockmap::on_edge(uint32_t i) {
+   if ((i+width_)%size_ < 2*width_ || (i+1)%width_ < 2)
+      return true;
+   return false;
+}
+
 template<typename L>
 void blockmap::for_all_blocks(L lambda) {
    for (uint32_t i=0; i<size_; ++i) lambda(i);
@@ -131,7 +138,6 @@ bool blockmap::check_well_formed(uint32_t i) {
          return false;
       }
    } else {
-      /* assume patch blocks cannot exist on edges */
       if (!check_diagonal(i, i-width_-1)
             || !check_diagonal(i, i-width_+1)) {
          printf("error: diagonal border\n");

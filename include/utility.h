@@ -1,6 +1,9 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include <iostream>
+#include <numeric>
+
 template<template<typename...> class T, typename U>
 void print_comma_separated(T<U> c) {
    std::adjacent_difference(std::begin(c), std::end(c),

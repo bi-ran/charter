@@ -1,9 +1,6 @@
 #include <deque>
 #include <fstream>
-#include <iostream>
-#include <numeric>
 #include <set>
-#include <stack>
 #include <string>
 #include <vector>
 

@@ -10,6 +10,10 @@
 #include "include/blockmap.h"
 #include "include/utility.h"
 
+static const std::vector<std::string> colours = {
+   "\033[0m", "\033[41m", "\033[43m", "\033[42m",
+   "\033[46m", "\033[44m", "\033[45m", "\033[101m" };
+
 int chart(const char* input) {
    /* open file */
    std::ifstream fstream(input);
@@ -58,7 +62,8 @@ int chart(const char* input) {
 
    /* output coloured diagram */
    if (patches.size() < colours.size())
-      chart->colour_display();
+      chart->display_2d([&](uint8_t b) {
+         return colours[b] + " " + colours[0]; });
 
    /* merge patches for overall canvas size */
    std::vector<uint32_t> merged;

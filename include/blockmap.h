@@ -7,10 +7,6 @@
 #include <stack>
 #include <string>
 
-static const std::vector<const char*> colours = {
-   "\033[0m", "\033[41m", "\033[43m", "\033[42m",
-   "\033[46m", "\033[44m", "\033[45m", "\033[101m" };
-
 class blockmap {
    private:
       uint8_t* map_;
@@ -46,8 +42,6 @@ class blockmap {
       bool check_well_formed(uint32_t i);
       bool check_neighbours(uint32_t i);
       bool check_diagonal(uint32_t i, uint32_t j);
-
-      void colour_display();
 };
 
 template<template<typename...> class T>
@@ -155,15 +149,6 @@ bool blockmap::check_diagonal(uint32_t i, uint32_t j) {
    if (map_[ij] && map_[ji] && !map_[j])
       return false;
    return true;
-}
-
-/* display coloured map */
-void blockmap::colour_display() {
-   for (uint32_t i=0; i<size_; ++i) {
-      printf("%s %s", colours[map_[i]], colours[0]);
-      if (i%width_ == width_-1)
-         printf("\n");
-   }
 }
 
 #endif /* BLOCKMAP_H */

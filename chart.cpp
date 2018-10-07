@@ -52,8 +52,12 @@ int chart(const char* input) {
    }
 
    /* expand all patches to pixel left/above */
-   for (auto& p : patches)
-      chart->expand_block(p);
+   for (auto& p : patches) {
+      for (const auto& b : p)
+         p.insert(chart->west(b));
+      for (const auto& b : p)
+         p.insert(chart->north(b));
+   }
 
    /* reformat blockmap */
    chart->reset_map();

@@ -31,10 +31,14 @@ class blockmap {
       void rewrite(const T<uint32_t>& set, uint8_t i);
 
       std::set<uint32_t> explore(uint32_t i);
-      void expand_block(std::set<uint32_t>& patch);
 
       template<template<typename...> class T>
       uint32_t bounding_box(const T<uint32_t>& patch);
+
+      inline uint32_t east(uint32_t i) { return i + 1; }
+      inline uint32_t south(uint32_t i) { return i + width_; }
+      inline uint32_t west(uint32_t i) { return i - 1; }
+      inline uint32_t north(uint32_t i) { return i - width_; }
 
       template<typename L>
       void for_direct_neighbours(uint32_t i, L lambda);
@@ -83,13 +87,6 @@ std::set<uint32_t> blockmap::explore(uint32_t i) {
    }
 
    return patch;
-}
-
-void blockmap::expand_block(std::set<uint32_t>& patch) {
-   for (const auto& b : patch)
-      patch.insert(b-1);
-   for (const auto& b : patch)
-      patch.insert(b-width_);
 }
 
 template<template<typename...> class T>

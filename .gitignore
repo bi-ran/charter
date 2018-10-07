@@ -1,0 +1,13 @@
+# ignore files without extensions
+*
+!*.*
+!*/
+
+# dependency files
+*.d
+
+# temporary files
+*.swp
+
+# build directory
+build/

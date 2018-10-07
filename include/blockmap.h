@@ -115,9 +115,7 @@ bool blockmap::check_well_formed(uint32_t i) {
    } else {
       /* assume patch blocks cannot exist on edges */
       if (!check_diagonal(i, i-width_-1)
-            || !check_diagonal(i, i-width_+1)
-            || !check_diagonal(i, i+width_-1)
-            || !check_diagonal(i, i+width_+1)) {
+            || !check_diagonal(i, i-width_+1)) {
          printf("error: diagonal border\n");
          return false;
       }

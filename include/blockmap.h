@@ -37,6 +37,9 @@ class blockmap {
       uint32_t bounding_box(const T<uint32_t>& patch);
 
       template<typename L>
+      void for_direct_neighbours(uint32_t i, L lambda);
+
+      template<typename L>
       void display_2d(L lambda);
 
       bool check_well_formed(uint32_t i);
@@ -75,10 +78,8 @@ std::set<uint32_t> blockmap::explore(uint32_t i) {
       if (map_[i] & 0x3) { continue; }
 
       map_[i] |= 0x2; patch.insert(i);
-      if (i%width_) blocks.push(i-1);
-      if (i%width_+1 < width_) blocks.push(i+1);
-      if (i/width_) blocks.push(i-width_);
-      if (i/width_+1 < height_) blocks.push(i+width_);
+      for_direct_neighbours(i, [&](uint32_t j) {
+         blocks.push(j); });
    }
 
    return patch;
@@ -102,6 +103,14 @@ uint32_t blockmap::bounding_box(const T<uint32_t>& patch) {
    auto yspan = *yb.second/width_ - *yb.first/width_ + 1;
 
    return xspan * yspan;
+}
+
+template<typename L>
+void blockmap::for_direct_neighbours(uint32_t i, L lambda) {
+   if (i%width_) lambda(i-1);
+   if (i%width_+1 < width_) lambda(i+1);
+   if (i/width_) lambda(i-width_);
+   if (i/width_+1 < height_) lambda(i+width_);
 }
 
 template<typename L>
@@ -133,10 +142,8 @@ bool blockmap::check_well_formed(uint32_t i) {
 
 bool blockmap::check_neighbours(uint32_t i) {
    uint32_t nb = 0;
-   if (i%width_ && map_[i-1]) ++nb;
-   if (i%width_+1 < width_ && map_[i+1]) ++nb;
-   if (i/width_ && map_[i-width_]) ++nb;
-   if (i/width_+1 < height_ && map_[i+width_]) ++nb;
+   for_direct_neighbours(i, [&](uint32_t j) {
+      if (map_[j]) ++nb; });
 
    if (nb < 2)
       return false;

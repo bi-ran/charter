@@ -115,8 +115,7 @@ box* blockmap::bounding_box(const T<uint32_t>& patch) const {
 
 bool blockmap::on_edge(uint32_t i) {
    if ((i+width_)%size_ < 2*width_ || (i+1)%width_ < 2)
-      return true;
-   return false;
+      return true; return false;
 }
 
 template<typename L>
@@ -147,12 +146,10 @@ bool blockmap::check_well_formed(uint32_t i) const {
          printf("error: incomplete border\n");
          return false;
       }
-   } else {
-      if (!check_diagonal(i, i-width_-1)
-            || !check_diagonal(i, i-width_+1)) {
-         printf("error: diagonal border\n");
-         return false;
-      }
+   } else if (!check_diagonal(i, i-width_-1)
+         || !check_diagonal(i, i-width_+1)) {
+      printf("error: diagonal border\n");
+      return false;
    }
 
    return true;
@@ -162,18 +159,14 @@ bool blockmap::check_neighbours(uint32_t i) const {
    uint32_t nb = 0;
    for_direct_neighbours(i, [&](uint32_t j) {
       if (map_[j]) ++nb; });
-
-   if (nb < 2)
-      return false;
-   return true;
+   if (nb < 2) return false; return true;
 }
 
 bool blockmap::check_diagonal(uint32_t i, uint32_t j) const {
    uint32_t ij = i + j%width_ - i%width_;
    uint32_t ji = j + i%width_ - j%width_;
    if (map_[ij] && map_[ji] && !map_[j])
-      return false;
-   return true;
+      return false; return true;
 }
 
 #endif /* BLOCKMAP_H */

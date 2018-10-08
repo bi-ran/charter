@@ -10,7 +10,7 @@ void print_comma_separated(T<U> c) {
       std::ostream_iterator<U>(std::cout),
       [](const U& x, const U&) -> U {
          return std::cout << ", ", x; });
-   printf("\n");
+   std::cout << std::endl;
 }
 
 #endif /* UTILITY_H */

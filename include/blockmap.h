@@ -30,29 +30,29 @@ class blockmap {
       void rewrite(const T<uint32_t>& set, uint8_t i);
 
       std::set<uint32_t> explore(uint32_t i);
-      std::set<uint32_t> blockset_from_box(const box& b);
+      std::set<uint32_t> blockset_from_box(const box& b) const;
 
       template<template<typename...> class T>
-      box* bounding_box(const T<uint32_t>& patch);
+      box* bounding_box(const T<uint32_t>& patch) const;
 
-      inline uint32_t east(uint32_t i) { return i + 1; }
-      inline uint32_t south(uint32_t i) { return i + width_; }
-      inline uint32_t west(uint32_t i) { return i - 1; }
-      inline uint32_t north(uint32_t i) { return i - width_; }
+      inline uint32_t east(uint32_t i) const { return i + 1; }
+      inline uint32_t south(uint32_t i) const { return i + width_; }
+      inline uint32_t west(uint32_t i) const { return i - 1; }
+      inline uint32_t north(uint32_t i) const { return i - width_; }
       bool on_edge(uint32_t i);
 
       template<typename L>
-      void for_all_blocks(L lambda);
+      void for_all_blocks(L lambda) const;
 
       template<typename L>
-      void for_direct_neighbours(uint32_t i, L lambda);
+      void for_direct_neighbours(uint32_t i, L lambda) const;
 
       template<typename L>
-      void display_2d(L lambda);
+      void display_2d(L lambda) const;
 
-      bool check_well_formed(uint32_t i);
-      bool check_neighbours(uint32_t i);
-      bool check_diagonal(uint32_t i, uint32_t j);
+      bool check_well_formed(uint32_t i) const;
+      bool check_neighbours(uint32_t i) const;
+      bool check_diagonal(uint32_t i, uint32_t j) const;
 };
 
 template<template<typename...> class T>
@@ -93,7 +93,7 @@ std::set<uint32_t> blockmap::explore(uint32_t i) {
    return patch;
 }
 
-std::set<uint32_t> blockmap::blockset_from_box(const box& b) {
+std::set<uint32_t> blockmap::blockset_from_box(const box& b) const {
    std::set<uint32_t> set;
    for (uint32_t i=b.ymin(); i<b.ymax(); ++i)
       for (uint32_t j=b.xmin(); j<b.xmax(); ++j)
@@ -103,7 +103,7 @@ std::set<uint32_t> blockmap::blockset_from_box(const box& b) {
 }
 
 template<template<typename...> class T>
-box* blockmap::bounding_box(const T<uint32_t>& patch) {
+box* blockmap::bounding_box(const T<uint32_t>& patch) const {
    auto xb = std::minmax_element(std::begin(patch), std::end(patch),
       [&](auto a, auto b) { return (a%width_) < (b%width_); });
    auto yb = std::minmax_element(std::begin(patch), std::end(patch),
@@ -120,12 +120,12 @@ bool blockmap::on_edge(uint32_t i) {
 }
 
 template<typename L>
-void blockmap::for_all_blocks(L lambda) {
+void blockmap::for_all_blocks(L lambda) const {
    for (uint32_t i=0; i<size_; ++i) lambda(i);
 }
 
 template<typename L>
-void blockmap::for_direct_neighbours(uint32_t i, L lambda) {
+void blockmap::for_direct_neighbours(uint32_t i, L lambda) const {
    if (i%width_) lambda(i-1);
    if (i%width_+1 < width_) lambda(i+1);
    if (i/width_) lambda(i-width_);
@@ -133,7 +133,7 @@ void blockmap::for_direct_neighbours(uint32_t i, L lambda) {
 }
 
 template<typename L>
-void blockmap::display_2d(L lambda) {
+void blockmap::display_2d(L lambda) const {
    for (uint32_t i=0; i<height_; ++i) {
       for (uint32_t j=0; j<width_; ++j)
          std::cout << lambda(map_[i*width_+j]);
@@ -141,7 +141,7 @@ void blockmap::display_2d(L lambda) {
    }
 }
 
-bool blockmap::check_well_formed(uint32_t i) {
+bool blockmap::check_well_formed(uint32_t i) const {
    if (map_[i]) {
       if (!check_neighbours(i)) {
          printf("error: incomplete border\n");
@@ -158,7 +158,7 @@ bool blockmap::check_well_formed(uint32_t i) {
    return true;
 }
 
-bool blockmap::check_neighbours(uint32_t i) {
+bool blockmap::check_neighbours(uint32_t i) const {
    uint32_t nb = 0;
    for_direct_neighbours(i, [&](uint32_t j) {
       if (map_[j]) ++nb; });
@@ -168,7 +168,7 @@ bool blockmap::check_neighbours(uint32_t i) {
    return true;
 }
 
-bool blockmap::check_diagonal(uint32_t i, uint32_t j) {
+bool blockmap::check_diagonal(uint32_t i, uint32_t j) const {
    uint32_t ij = i + j%width_ - i%width_;
    uint32_t ji = j + i%width_ - j%width_;
    if (map_[ij] && map_[ji] && !map_[j])

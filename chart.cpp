@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "include/box.h"
 #include "include/blockmap.h"
 #include "include/utility.h"
 
@@ -70,7 +71,7 @@ int chart(const char* input) {
          std::back_inserter(merged));
 
    /* find bounding rectangles for all patches */
-   std::vector<uint32_t> bounds;
+   std::vector<box*> bounds;
    bounds.emplace_back(chart->bounding_box(merged));
    for (const auto& p : patches)
       bounds.emplace_back(chart->bounding_box(p));

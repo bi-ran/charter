@@ -7,6 +7,8 @@
 #include <stack>
 #include <string>
 
+#include "box.h"
+
 class blockmap {
    private:
       uint8_t* map_;
@@ -30,7 +32,7 @@ class blockmap {
       std::set<uint32_t> explore(uint32_t i);
 
       template<template<typename...> class T>
-      uint32_t bounding_box(const T<uint32_t>& patch);
+      box* bounding_box(const T<uint32_t>& patch);
 
       inline uint32_t east(uint32_t i) { return i + 1; }
       inline uint32_t south(uint32_t i) { return i + width_; }
@@ -91,16 +93,14 @@ std::set<uint32_t> blockmap::explore(uint32_t i) {
 }
 
 template<template<typename...> class T>
-uint32_t blockmap::bounding_box(const T<uint32_t>& patch) {
+box* blockmap::bounding_box(const T<uint32_t>& patch) {
    auto xb = std::minmax_element(std::begin(patch), std::end(patch),
       [&](auto a, auto b) { return (a%width_) < (b%width_); });
    auto yb = std::minmax_element(std::begin(patch), std::end(patch),
       [&](auto a, auto b) { return (a/width_) < (b/width_); });
 
-   auto xspan = (*xb.second - *xb.first) % width_ + 1;
-   auto yspan = *yb.second/width_ - *yb.first/width_ + 1;
-
-   return xspan * yspan;
+   return new box(*xb.first % width_, *yb.first / width_,
+      *xb.second % width_ + 1, *yb.second / width_ + 1);
 }
 
 bool blockmap::on_edge(uint32_t i) {

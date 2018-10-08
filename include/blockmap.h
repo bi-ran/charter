@@ -30,6 +30,7 @@ class blockmap {
       void rewrite(const T<uint32_t>& set, uint8_t i);
 
       std::set<uint32_t> explore(uint32_t i);
+      std::set<uint32_t> blockset_from_box(const box& b);
 
       template<template<typename...> class T>
       box* bounding_box(const T<uint32_t>& patch);
@@ -90,6 +91,15 @@ std::set<uint32_t> blockmap::explore(uint32_t i) {
    }
 
    return patch;
+}
+
+std::set<uint32_t> blockmap::blockset_from_box(const box& b) {
+   std::set<uint32_t> set;
+   for (uint32_t i=b.ymin(); i<b.ymax(); ++i)
+      for (uint32_t j=b.xmin(); j<b.xmax(); ++j)
+         set.insert(i*width_+j);
+
+   return set;
 }
 
 template<template<typename...> class T>

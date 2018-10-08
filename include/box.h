@@ -15,12 +15,12 @@ class box {
             xmin_(xmin), ymin_(ymin), xmax_(xmax), ymax_(ymax) {
          area_ = (xmax_ - xmin_) * (ymax_ - ymin_); };
 
-      uint32_t area() { return area_; }
+      uint32_t area() const { return area_; }
 
-      uint32_t xmin() { return xmin_; }
-      uint32_t ymin() { return ymin_; }
-      uint32_t xmax() { return xmax_; }
-      uint32_t ymax() { return ymax_; }
+      uint32_t xmin() const { return xmin_; }
+      uint32_t ymin() const { return ymin_; }
+      uint32_t xmax() const { return xmax_; }
+      uint32_t ymax() const { return ymax_; }
 };
 
 #endif /* BOX_H */

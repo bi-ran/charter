@@ -59,10 +59,12 @@ int chart(const char* input) {
    for (uint32_t i=0; i<patches.size(); ++i)
       chart->rewrite(patches[i], i+1);
 
+   auto colour = [&](uint8_t b) {
+      return colours[b] + " " + colours[0]; };
+
    /* output coloured diagram */
    if (patches.size() < colours.size())
-      chart->display_2d([&](uint8_t b) {
-         return colours[b] + " " + colours[0]; });
+      chart->display_2d(colour);
 
    /* merge patches for overall canvas size */
    std::vector<uint32_t> merged;
@@ -76,11 +78,15 @@ int chart(const char* input) {
    for (const auto& p : patches)
       bounds.emplace_back(chart->bounding_box(p));
 
-   /* input dimensions
-    *    highlight frame border
-    *    automatically identify equivalent borders
-    *       and assign dimensions
-    */
+   for (auto b : bounds) {
+      chart->reset_map();
+      chart->rewrite(merged, 7);
+      /* highlight frame (bounding rectange) */
+      chart->rewrite(chart->blockset_from_box(*b), 1);
+      chart->display_2d(colour);
+
+      /* prompt for dimensions */
+   }
 
    return 0;
 }

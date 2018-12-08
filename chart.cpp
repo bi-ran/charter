@@ -1,5 +1,6 @@
 #include <deque>
 #include <fstream>
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -11,6 +12,19 @@
 static const std::vector<std::string> colours = {
    "\033[0m", "\033[41m", "\033[43m", "\033[42m",
    "\033[46m", "\033[44m", "\033[45m", "\033[101m" };
+
+uint32_t resolve(uint32_t b, std::multimap<uint32_t, uint32_t>& stacks,
+                 std::vector<uint32_t>& layers) {
+   uint32_t max = 0;
+   auto range = stacks.equal_range(b);
+   std::for_each(range.first, range.second, [&](const auto& r) {
+      if (layers[r.second] == 0)
+         layers[r.second] = resolve(r.second, stacks, layers);
+      max = std::max(layers[r.second], max);
+   });
+
+   return ++max;
+}
 
 int chart(const char* input) {
    /* open file */
@@ -74,7 +88,6 @@ int chart(const char* input) {
 
    /* find bounding rectangles for all patches */
    std::vector<box*> bounds;
-   bounds.emplace_back(chart->bounding_box(merged));
    for (const auto& p : patches)
       bounds.emplace_back(chart->bounding_box(p));
 
@@ -87,6 +100,43 @@ int chart(const char* input) {
 
       /* prompt for dimensions */
    }
+
+   /* determine layering of bounds */
+   std::multimap<uint32_t, uint32_t> stacks;
+   for (uint32_t i=0; i<bounds.size(); ++i) {
+      if (bounds[i]->area() == patches[i].size())
+         continue;
+
+      /* record patches that lie above a bounding rectangle */
+      const auto& blockset = chart->blockset_from_box(*bounds[i]);
+      for (uint32_t j=0; j<patches.size(); ++j) {
+         if (j == i) { continue; }
+
+         std::set<uint32_t> intersection;
+         std::set_intersection(patches[j].begin(), patches[j].end(),
+            blockset.begin(), blockset.end(),
+            std::inserter(intersection, intersection.begin()));
+         if (!intersection.empty()) { stacks.emplace(j, i); }
+      }
+   }
+
+   /* check for circular dependencies */
+   for (const auto& s : stacks) {
+      auto range = stacks.equal_range(s.second);
+      std::for_each(range.first, range.second, [&](const auto& r) {
+         if (r.second == s.first) {
+            printf("circular dependency: chart not well-formed!\n");
+            exit(1);
+         }
+      });
+   }
+
+   /* loop over patches and find longest chain */
+   std::vector<uint32_t> layers(bounds.size(), 0);
+   for (uint32_t i=0; i<bounds.size(); ++i)
+      layers[i] = resolve(i, stacks, layers);
+
+   /* draw pads from bounds with shortest chain */
 
    return 0;
 }

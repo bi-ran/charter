@@ -129,7 +129,17 @@ int chart(const char* input) {
    for (uint32_t i=0; i<bounds.size(); ++i)
       layers[i] = resolve(i, stacks, layers);
 
+   /* sort in order of drawing */
+   std::multimap<uint32_t, uint32_t> sequence;
+   for (uint32_t i=0; i<layers.size(); ++i)
+      sequence.emplace(layers[i], i);
+
    /* draw pads from bounds with shortest chain */
+   chart->reset_map();
+   for (const auto& s : sequence)
+      chart->rewrite(chart->blockset_from_box(
+         *bounds[s.second]), s.second+1);
+   chart->display_2d(colour);
 
    return 0;
 }

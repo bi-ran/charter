@@ -29,10 +29,7 @@ uint32_t resolve(uint32_t b, std::multimap<uint32_t, uint32_t>& stacks,
 int chart(const char* input) {
    /* open file */
    std::ifstream fstream(input);
-   if (!fstream) {
-      printf("invalid file\n");
-      return 1;
-   }
+   if (!fstream) { printf("invalid file\n"); return 1; }
 
    /* read input */
    std::string line;
@@ -47,10 +44,7 @@ int chart(const char* input) {
    chart->for_all_blocks([&](uint32_t i) {
       if (chart->on_edge(i)) chart->explore(i); });
 
-   /* check for well-formedness of input
-    *    ! border blocks with only one neighbouring block
-    *    ! diagonal blocks
-    */
+   /* check for well-formedness of input */
    chart->for_all_blocks([&](uint32_t i) {
       if (!chart->check_well_formed(i)) exit(1); });
 
@@ -58,7 +52,7 @@ int chart(const char* input) {
    std::deque<std::set<uint32_t>> patches;
    chart->for_all_blocks([&](uint32_t i) {
       std::set<uint32_t>&& p = chart->explore(i);
-      if (p.size()) patches.emplace_back(p); });
+      if (!p.empty()) patches.emplace_back(p); });
 
    /* expand all patches to pixel left/above */
    for (auto& p : patches) {
@@ -83,18 +77,17 @@ int chart(const char* input) {
    /* merge patches for overall canvas size */
    std::vector<uint32_t> merged;
    for (const auto& p : patches)
-      std::copy(std::begin(p), std::end(p),
-         std::back_inserter(merged));
+      std::copy(std::begin(p), std::end(p), std::back_inserter(merged));
 
    /* find bounding rectangles for all patches */
    std::vector<box*> bounds;
    for (const auto& p : patches)
       bounds.emplace_back(chart->bounding_box(p));
 
+   /* highlight frames (bounding rectange) */
    for (auto b : bounds) {
       chart->reset_map();
       chart->rewrite(merged, 7);
-      /* highlight frame (bounding rectange) */
       chart->rewrite(chart->blockset_from_box(*b), 1);
       chart->display_2d(colour);
 

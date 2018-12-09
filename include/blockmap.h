@@ -143,22 +143,17 @@ void blockmap::display_2d(L lambda) const {
 bool blockmap::check_well_formed(uint32_t i) const {
    if (map_[i]) {
       if (!check_neighbours(i)) {
-         printf("error: incomplete border\n");
-         return false;
-      }
+         printf("error: incomplete border\n"); return false; }
    } else if (!check_diagonal(i, i-width_-1)
          || !check_diagonal(i, i-width_+1)) {
-      printf("error: diagonal border\n");
-      return false;
-   }
+      printf("error: diagonal border\n"); return false; }
 
    return true;
 }
 
 bool blockmap::check_neighbours(uint32_t i) const {
    uint32_t nb = 0;
-   for_direct_neighbours(i, [&](uint32_t j) {
-      if (map_[j]) ++nb; });
+   for_direct_neighbours(i, [&](uint32_t j) { if (map_[j]) ++nb; });
    if (nb < 2) return false; return true;
 }
 

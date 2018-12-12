@@ -26,6 +26,11 @@ uint32_t resolve(uint32_t b, std::multimap<uint32_t, uint32_t>& stacks,
    return ++max;
 }
 
+inline void refer(uint32_t& coord) {
+   if (coord != 0xffff) { printf("%u [inf.]\n", coord); }
+   else { printf("_"); std::cin >> coord; }
+}
+
 int chart(const char* input) {
    /* open file */
    std::ifstream fstream(input);
@@ -84,20 +89,10 @@ int chart(const char* input) {
    for (const auto& p : patches)
       bounds.emplace_back(chart->bounding_box(p));
 
-   /* highlight frames (bounding rectange) */
-   for (auto b : bounds) {
-      chart->reset_map();
-      chart->rewrite(merged, 7);
-      chart->rewrite(chart->blockset_from_box(*b), 1);
-      chart->display_2d(colour);
-
-      /* prompt for dimensions */
-   }
-
    /* determine layering of bounds */
    std::multimap<uint32_t, uint32_t> stacks;
    for (uint32_t i=0; i<bounds.size(); ++i) {
-      if (bounds[i]->area() == patches[i].size())
+      if (bounds[i]->size() == patches[i].size())
          continue;
 
       /* record patches that lie above a bounding rectangle */
@@ -140,6 +135,30 @@ int chart(const char* input) {
       chart->rewrite(chart->blockset_from_box(
          *bounds[s.second]), s.second+1);
    chart->display_2d(colour);
+
+   /* frame dimensions */
+   const auto& frame = chart->bounding_box(merged);
+   std::vector<uint32_t> xcoords(frame->xmax()+1, 0xffff);
+   std::vector<uint32_t> ycoords(frame->ymax()+1, 0xffff);
+
+   /* highlight frames (bounding rectange) */
+   for (uint32_t i=0; i<bounds.size(); ++i) {
+      const auto& b = *bounds[i];
+
+      chart->reset_map();
+      chart->rewrite(merged, 7);
+      chart->rewrite(chart->blockset_from_box(b), 1);
+      chart->display_2d(colour);
+
+      /* infer coordinates from existing dimensions */
+      /* read input interactively from stdin */
+      printf("x-coordinates:\n");
+      printf("  xmin: "); refer(xcoords[b.xmin()]);
+      printf("  xmax: "); refer(xcoords[b.xmax()]);
+      printf("y-coordinates:\n");
+      printf("  ymin: "); refer(ycoords[b.ymin()]);
+      printf("  ymax: "); refer(ycoords[b.ymax()]);
+   }
 
    return 0;
 }

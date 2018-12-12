@@ -160,6 +160,12 @@ int chart(const char* input) {
       printf("  ymax: "); refer(ycoords[b.ymax()]);
    }
 
+   /* check input coordinates for consistency */
+   /* TODO: add diagnostic message */
+   if (!std::is_sorted(xcoords.begin(), xcoords.end())
+         || !std::is_sorted(ycoords.begin(), ycoords.end())) {
+      printf("inconsistent coordinates!\n"); exit(1); }
+
    return 0;
 }
 
